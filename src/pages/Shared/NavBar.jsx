@@ -1,7 +1,16 @@
 import React from "react";
+import {useContext} from "react";
 import {Link} from "react-router-dom";
+import {FaShoppingCart} from "react-icons/fa";
+import {AuthContext} from "../../providers/AuthProvider";
+import useCart from "../../hooks/useCart";
 
 const NavBar = () => {
+  const {user, logOut} = useContext(AuthContext);
+  const [cart] = useCart();
+  const handleLogOut = () => {
+    logOut();
+  };
   const navList = (
     <>
       <li>
@@ -13,6 +22,45 @@ const NavBar = () => {
       <li>
         <Link to="/order/salad">Order Food</Link>
       </li>
+      <li>
+        <Link to="/dashboard/mycart">
+          <button className="badge badge-secondary">
+            <FaShoppingCart></FaShoppingCart>
+            <span>+{cart?.length || 0}</span>
+          </button>
+        </Link>
+      </li>
+      {user && (
+        <li>
+          <Link to="/secret">Private</Link>
+        </li>
+      )}
+      {user ? (
+        <>
+          {user.photoURL && (
+            <li>
+              <span className="mr-2">
+                <img
+                  width={40}
+                  className="rounded-full h-[40px]"
+                  src={user.photoURL}
+                  alt=""
+                />
+              </span>
+            </li>
+          )}
+          <li>
+            <span>{user.displayName}</span>
+          </li>
+          <li>
+            <button onClick={handleLogOut}>LOGOUT</button>
+          </li>
+        </>
+      ) : (
+        <li>
+          <Link to="/login">LOGIN</Link>
+        </li>
+      )}
     </>
   );
   return (
@@ -44,10 +92,12 @@ const NavBar = () => {
           <a className="btn btn-ghost normal-case text-xl">Bistro Boss</a>
         </div>
         <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1">{navList}</ul>
+          <ul className="menu menu-horizontal px-1 flex items-center">
+            {navList}
+          </ul>
         </div>
         <div className="navbar-end">
-          <Link to="/login" className="btn btn-gray">
+          <Link to="/signup" className="btn btn-gray">
             Sign Up
           </Link>
         </div>
