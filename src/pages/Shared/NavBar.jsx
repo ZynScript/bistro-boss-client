@@ -1,12 +1,13 @@
 import React from "react";
-import {useContext} from "react";
 import {Link} from "react-router-dom";
 import {FaShoppingCart} from "react-icons/fa";
-import {AuthContext} from "../../providers/AuthProvider";
 import useCart from "../../hooks/useCart";
+import useAuth from "../../hooks/useAuth";
+import useAdmin from "../../hooks/useAdmin";
 
 const NavBar = () => {
-  const {user, logOut} = useContext(AuthContext);
+  const {user, logOut} = useAuth();
+  const [isAdmin] = useAdmin();
   const [cart] = useCart();
   const handleLogOut = () => {
     logOut();
@@ -22,20 +23,27 @@ const NavBar = () => {
       <li>
         <Link to="/order/salad">Order Food</Link>
       </li>
-      <li>
-        <Link to="/dashboard/mycart">
-          <button className="badge badge-secondary">
-            <FaShoppingCart></FaShoppingCart>
-            <span>+{cart?.length || 0}</span>
-          </button>
-        </Link>
-      </li>
       {user && (
         <li>
           <Link to="/secret">Private</Link>
         </li>
       )}
-      {user ? (
+      {isAdmin && (
+        <li>
+          <Link to="/dashboard/">Admin Panel</Link>
+        </li>
+      )}
+      {!isAdmin && (
+        <li>
+          <Link to="/dashboard/myCart">
+            <button className="badge badge-secondary">
+              <FaShoppingCart></FaShoppingCart>
+              <span>+{cart?.length || 0}</span>
+            </button>
+          </Link>
+        </li>
+      )}
+      {user && (
         <>
           {user.photoURL && (
             <li>
@@ -52,14 +60,7 @@ const NavBar = () => {
           <li>
             <span>{user.displayName}</span>
           </li>
-          <li>
-            <button onClick={handleLogOut}>LOGOUT</button>
-          </li>
         </>
-      ) : (
-        <li>
-          <Link to="/login">LOGIN</Link>
-        </li>
       )}
     </>
   );
@@ -97,9 +98,17 @@ const NavBar = () => {
           </ul>
         </div>
         <div className="navbar-end">
-          <Link to="/signup" className="btn btn-gray">
-            Sign Up
-          </Link>
+          {user ? (
+            <button className="btn btn-primary" onClick={handleLogOut}>
+              LOGOUT
+            </button>
+          ) : (
+            <button>
+              <Link className="btn btn-success" to="/login">
+                LOGIN
+              </Link>
+            </button>
+          )}
         </div>
       </div>
     </>

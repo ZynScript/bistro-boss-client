@@ -50,7 +50,7 @@ const Dashboard = () => {
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/dashboard/add-items">
+                  <NavLink to="/dashboard/add-item">
                     <FaUtensils />
                     Add Items
                   </NavLink>

@@ -1,13 +1,15 @@
 import React from "react";
-import useCart from "../../hooks/useCart";
+import SectionTitle from "../../components/SectionTitle";
 import {Helmet} from "react-helmet-async";
-import {FaTrashAlt} from "react-icons/fa";
+import useMenu from "../../hooks/useMenu";
+import {FaEdit, FaTrashAlt} from "react-icons/fa";
 import Swal from "sweetalert2";
-import {Link} from "react-router-dom";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
-const MyCart = () => {
-  const [cart, refetch] = useCart();
-  const total = cart.reduce((sum, item) => item.price + sum, 0);
+const ManageItems = () => {
+  const [menu, refetch] = useMenu();
+  const [axiosSecure] = useAxiosSecure();
+
   const handleDelete = (item) => {
     Swal.fire({
       title: "Are you sure?",
@@ -19,35 +21,29 @@ const MyCart = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:5000/carts/${item._id}`, {
-          method: "DELETE",
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.deletedCount > 0) {
-              refetch();
-              Swal.fire("Deleted!", "Your file has been deleted.", "success");
-            }
-          });
+        axiosSecure.delete(`/menu/${item._id}`).then((res) => {
+          console.log("deleted res", res.data);
+          if (res.data.deletedCount > 0) {
+            refetch();
+            Swal.fire(
+              "Deleted!",
+              "Item Has Been Deleted Successfully.",
+              "success"
+            );
+          }
+        });
       }
     });
   };
 
   return (
-    <div className="w-full lg:ms-10">
+    <div className="w-full px-5">
       <Helmet>
-        <title>Bistro Boss | MyCart</title>
+        <title>Bistro Boss | Manage Items</title>
       </Helmet>
-      <div className="font-semibold py-5 flex justify-evenly items-center gap-3">
-        <h3 className="lg:text-3xl">TOTAL ITEM: {cart.length}</h3> |
-        <h3 className="lg:text-3xl">TOTAL PRICE: ${total.toFixed(2)}</h3> |
-        <Link to="/dashboard/payment">
-          <button className="btn btn-success">PAY</button>
-        </Link>
-      </div>
-      <div className="overflow-x-auto bg-base-200 p-10 rounded-lg">
+      <SectionTitle heading={"Manage All Items"} subHeading={"Hurry Up"} />
+      <div className="overflow-x-auto">
         <table className="table">
-          {/* head */}
           <thead>
             <tr>
               <th>#</th>
@@ -55,10 +51,11 @@ const MyCart = () => {
               <th>Item Name</th>
               <th>Price</th>
               <th>Action</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {cart.map((item, idx) => (
+            {menu.map((item, idx) => (
               <tr key={item._id}>
                 <td>{idx + 1}</td>
                 <td>
@@ -73,8 +70,13 @@ const MyCart = () => {
                     </div>
                   </div>
                 </td>
-                <td>{item.name}</td>
+                <td className="font-semibold">{item.name}</td>
                 <td className="font-semibold">${item.price.toFixed(2)}</td>
+                <td>
+                  <button className="btn text-[18px]">
+                    <FaEdit />
+                  </button>
+                </td>
                 <td>
                   <button
                     onClick={() => handleDelete(item)}
@@ -91,4 +93,4 @@ const MyCart = () => {
   );
 };
 
-export default MyCart;
+export default ManageItems;

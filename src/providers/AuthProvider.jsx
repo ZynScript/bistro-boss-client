@@ -50,6 +50,7 @@ const AuthProvider = ({children}) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      console.log(currentUser);
       // get and set token
       if (currentUser) {
         axios
@@ -59,15 +60,14 @@ const AuthProvider = ({children}) => {
           .then((data) => {
             console.log(data.data);
             localStorage.setItem("access-token", data.data);
-            setLoading(false);
           });
       } else {
         localStorage.removeItem("access-token");
       }
-      console.log(currentUser);
+      setLoading(false);
     });
     return () => {
-      unsubscribe();
+      return unsubscribe();
     };
   });
 
