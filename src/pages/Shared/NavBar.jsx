@@ -30,7 +30,7 @@ const NavBar = () => {
       )}
       {isAdmin && (
         <li>
-          <Link to="/dashboard/">Admin Panel</Link>
+          <Link to="/dashboard/admin-panel">Admin Panel</Link>
         </li>
       )}
       {!isAdmin && (
